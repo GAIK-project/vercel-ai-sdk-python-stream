@@ -3,7 +3,7 @@
 import { useChat } from "@ai-sdk/react";
 
 export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+  const { messages, input, handleInputChange, handleSubmit, status } =
     useChat({
       // api: "/api/simple", // Straight to FastAPI (see next.config.ts)
       // streamProtocol: "text", // Only needed if you want use this simple API without route handler
@@ -12,14 +12,14 @@ export default function Chat() {
         {
           id: "initial",
           role: "system",
-          content: "Olet ystävällinen tekoälyavustaja, joka vastaa suomeksi.",
+          content: "You are a friendly AI assistant who responds in English.",
         },
       ],
     });
 
   return (
     <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
-      <h1 className="text-2xl font-bold mb-4">Chat-sovellus</h1>
+      <h1 className="text-2xl font-bold mb-4">Chat Application</h1>
 
       <div className="flex flex-col space-y-4 mb-16">
         {messages
@@ -31,7 +31,7 @@ export default function Chat() {
                 m.role === "user" ? "bg-blue-100 ml-8" : "bg-gray-100 mr-8"
               }`}
             >
-              <strong>{m.role === "user" ? "Sinä: " : "Tekoäly: "}</strong>
+              <strong>{m.role === "user" ? "You: " : "AI: "}</strong>
               <div className="whitespace-pre-wrap">{m.content}</div>
             </div>
           ))}
@@ -45,16 +45,16 @@ export default function Chat() {
           <input
             className="flex-1 p-2 border rounded"
             value={input}
-            placeholder="Kysy jotain..."
+            placeholder="Ask something..."
             onChange={handleInputChange}
-            disabled={isLoading}
+            disabled={status === "submitted" || status === "streaming"}
           />
           <button
             type="submit"
             className="p-2 border rounded bg-blue-500 text-white"
-            disabled={isLoading}
+            disabled={status === "submitted" || status === "streaming"}
           >
-            {isLoading ? "..." : "Lähetä"}
+            {status === "submitted" || status === "streaming" ? "..." : "Send"}
           </button>
         </div>
       </form>
