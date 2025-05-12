@@ -5,7 +5,9 @@ import { useChat } from "@ai-sdk/react";
 export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat({
-      api: "/api/python",
+      // api: "/api/simple", // Straight to FastAPI (see next.config.ts)
+      // streamProtocol: "text", // Only needed if you want use this simple API without route handler
+      api: "api/python", // === localhost:3000/api/python
       initialMessages: [
         {
           id: "initial",

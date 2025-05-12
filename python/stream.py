@@ -2,6 +2,7 @@ import json
 import os
 from typing import List
 
+import openai
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
@@ -25,6 +26,10 @@ class Message(BaseModel):
 class Request(BaseModel):
     messages: List[Message]
 
+
+class ChatRequest(BaseModel):
+    messages: List[Message]
+    
 @app.post("/api/chat")
 async def chat(request: Request):
     """
@@ -62,6 +67,19 @@ async def chat(request: Request):
     # Important: Vercel AI SDK needs this header
     response.headers["x-vercel-ai-data-stream"] = "v1"
     return response
+
+@app.post("/api/simple")
+def simple(body: ChatRequest):
+    def generate():
+        stream = client.chat.completions.create(
+            model="gpt-4.1-nano-2025-04-14",
+            messages=[m.model_dump() for m in body.messages],
+            stream=True,
+        )
+        for chunk in stream:
+            if (text := chunk.choices[0].delta.content):
+                yield text
+    return StreamingResponse(generate(), media_type="text/plain")
 
 # Simple health check endpoint
 @app.get("/health")
